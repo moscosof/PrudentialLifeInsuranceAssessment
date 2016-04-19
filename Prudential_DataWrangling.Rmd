@@ -1,0 +1,97 @@
+---
+title: "Prudential Data Wrangling"
+author: "Francia Moscoso"
+date: "April 15, 2016"
+output: html_document
+---
+**Loading Libraries**
+```{r LoadLib, message=F, warning=F}
+library(dplyr)     
+library(corrplot) 
+library(ggplot2)
+library(Amelia)
+```
+
+**Loading Data Sets**
+```{r loadDiamonds, comment="", echo=TRUE}
+# Working Directory
+setwd("~/SprintboardProject/PrudentialIns")  
+
+# Load raw data to 'train' and 'test' repositories
+train <- read.csv("./DataSets/train.csv", header = TRUE)
+test <-  read.csv("./DataSets/test.csv", header = TRUE)
+
+```
+
+
+**Read training data set dimension**
+```{r comment="", echo=TRUE}
+dim(train)
+```
+
+
+**Evaluate missing data**
+```{r comment="", echo=TRUE}
+missmap(train, main = "Missing values vs observed")
+# ---------------------------- To check missing values by subsets -----------
+#Id, Product_Info_1-7, Ins_age, Ht, Wt, BMI
+#missmap(subset(train,select=c(1:12)),   main = "Missing values vs observed")
+#Employment_Info_1-6
+#missmap(subset(train,select=c(13:18)),  main = "Missing values vs observed") 
+#InsuredInfo_1-6    InsuredInfo_7 is in the next block
+#missmap(subset(train,select=c(19:24)),  main = "Missing values vs observed")
+#Insurance_History_1-9 - THere is not Insurance_History-6 but InsuredInfo_7
+#Missing Data:Insurance_History_5
+#missmap(subset(train,select=c(25:33)),  main = "Missing values vs observed")
+#Family_Hist_1-5   
+#missmap(subset(train,select=c(34:38)),  main = "Missing values vs observed")
+#Medical_History_1-41
+#missmap(subset(train,select=c(39:59)),  main = "Missing values vs observed")
+#missmap(subset(train,select=c(60:79)),  main = "Missing values vs observed")
+#Medical_Keyword_1-48
+#missmap(subset(train,select=c(80:100)), main = "Missing values vs observed")
+#missmap(subset(train,select=c(101:127)),main = "Missing values vs observed")
+#Response
+#missmap(subset(train,select=c(128:128)),main = "Missing values vs observed")
+```
+
+**Ten columns with missing data:**<br>
+Insurance_History_5, Family_Hist_2 to Family_Hist_5, Medical_History_1, Medical_History_10,Medical_History15,Medical_History24,Medical_History32
+
+**Percentage of missing data**
+```{r comment="", echo=TRUE}
+#Number of rows in training data set
+TotRow <- nrow(train) 
+
+train %>% filter(is.na(Insurance_History_5)) %>% count()/TotRow
+train %>% filter(is.na(Family_Hist_2)) %>% count()/TotRow
+train %>% filter(is.na(Family_Hist_3)) %>% count()/TotRow
+train %>% filter(is.na(Family_Hist_4)) %>% count()/TotRow
+train %>% filter(is.na(Family_Hist_5)) %>% count()/TotRow
+train %>% filter(is.na(Medical_History_1)) %>% count()/TotRow
+train %>% filter(is.na(Medical_History_10)) %>% count()/TotRow
+train %>% filter(is.na(Medical_History_15)) %>% count()/TotRow
+train %>% filter(is.na(Medical_History_24)) %>% count()/TotRow
+train %>% filter(is.na(Medical_History_32)) %>% count()/TotRow
+
+#Note: Function 'table' does not give you the number of 'NAs' so I count them with function 'is.na'.
+#Function 'summary' shows the number of NA's
+
+```
+<br>
+**The following columns have significant missing data (>30%) so we should discard them in the analysis:**<br>
+Insurance_History_5 (42.76%)<br>
+Family_Hist_2(48.25%)<br>
+Family_Hist_3(57.66%)<br>
+Family_Hist_3(32.30%)           Should this variable be discarded???<br>
+Family_Hist_5(70.41)<br>
+Medical_History_10(99.06%)<br>
+Medical_History_15(75.10%)<br>
+Medical_History_24(93.59%)<br>
+Medical_History_32(98.13%)<br>
+
+
+tempo1 <- with(train, table(Ins_Age, Id))
+<br>
+<br>
+<br>
